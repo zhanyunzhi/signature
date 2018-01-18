@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-    {js href="../../static/js/jquery-3.2.1.min.js" /}
-    {js href="../../static/js/draw.js" /}
     <title>Title</title>
     <style>
         html,body{margin:0;padding:0;}
@@ -48,6 +46,8 @@
     <canvas></canvas>
 </div>
 </body>
+{js href="../../static/js/jquery-3.2.1.min.js" /}
+{js href="../../static/js/draw.js" /}
 <script>
 
     var canvasBox = document.getElementById('canvasBox');
@@ -122,7 +122,7 @@
         const failureCallback = (error) => {
             console.log(error);
         };
-        draw.upload(blob, url, successCallback, failureCallback);
+        draw.upload(image, blob, url, successCallback, failureCallback);
     };
 
 </script>

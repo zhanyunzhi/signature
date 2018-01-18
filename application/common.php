@@ -40,11 +40,13 @@ function saveBase64Image($base64_image_content){
         }
         //保存位置--图片名
         $image_name=date('His').str_pad(mt_rand(1, 99999), 5, '0', STR_PAD_LEFT).".".$type;
-        $image_url = 'uploads/image/'.date('Ymd').'/'.$image_name;
+        $image_url = 'uploads/images/'.date('Ymd').'/'.$image_name;
         if(!is_dir(dirname('./'.$image_url))){
+             mkdir(dirname('uploads/images/'));
+             mkdir(dirname('uploads/images/'.date('Ymd').'/'));
              mkdir(dirname('./'.$image_url));
             chmod(dirname('./'.$image_url), 0777);
-            umask($oldumask);
+            //umask($oldumask);
         }
         //解码
         $decode=base64_decode(str_replace($result[1], '', $base64_image_content));
