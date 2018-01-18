@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    {js href="../../static/js/jquery-3.2.1.min.js" /}
+    {js href="../../static/js/draw.js" /}
+    <title>Title</title>
+    <style>
+        a{
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div id="canvasBox" :style="getHorizontalStyle">
+    <div class="greet">
+        <span>Just use canvas to draw</span>
+        <a id="clear">清屏</a>
+        <a touchstart="download()" mousedown="download()" id="download">下载</a>
+        <select id="status">
+            <option value="0">正常</option>
+            <option value="90">顺时针旋转90°</option>
+            <option value="180">顺时针旋转180°</option>
+            <option value="-90">逆时针旋转90°</option>
+        </select>
+    </div>
+    <canvas></canvas>
+</div>
+</body>
+<script>
+    $("#status").change(function(){
+        getHorizontalStyle($(this).val())
+    });
+    $("#clear").on('touchstart mousedown',function(){
+        clear();
+    });
+    $("#download").on('touchstart mousedown',function(){
+        download()
+    });
+    var canvasBox = document.getElementById('canvasBox');
+    initCanvas(0);
+
+    function getHorizontalStyle(degree) {
+        degree = parseInt(degree);
+        const d = document;
+        const w = window.innerWidth || d.documentElement.clientWidth || d.body.clientWidth;
+        const h = window.innerHeight || d.documentElement.clientHeight || d.body.clientHeight;
+        let length = (h - w) / 2;
+        let width = w;
+        let height = h;
+        switch (degree) {
+            case -90:
+                length = -length;
+            case 90:
+                width = h;
+                height = w;
+                break;
+            default:
+                length = 0;
+        }
+        if (canvasBox) {
+            canvasBox.removeChild(document.querySelector('canvas'));
+            canvasBox.appendChild(document.createElement('canvas'));
+            setTimeout(() => {
+                initCanvas(degree);
+            }, 200);
+        }
+        return {
+            transform: 'rotate(' + degree + 'deg) translate(' + length + 'px,' + length + 'px)',
+            width: width + 'px',
+            height: height + 'px',
+            transformOrigin: 'center center',
+        };
+    };
+
+    function initCanvas(degree) {
+        const canvas = document.querySelector('canvas');
+        draw = new Draw(canvas, -degree);
+    };
+    function clear() {
+        draw.clear();
+    };
+    function download() {
+        draw.downloadPNGImage(this.draw.getPNGImage());
+    };
+    function upload() {
+        const image = this.draw.getPNGImage();
+        const blob = this.draw.dataURLtoBlob(image);
+        const url = '';
+        const successCallback = (response) => {
+            console.log(response);
+        };
+        const failureCallback = (error) => {
+            console.log(error);
+        };
+        draw.upload(blob, url, successCallback, failureCallback);
+    };
+
+</script>
+</html>
