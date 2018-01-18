@@ -10,4 +10,13 @@ class Index
     public function index2() {
          return view('./index',['name'=>'thinkphp']);
      }
+    public function uploadImage() {
+//        $file = request()->file('sign');
+        $file = $_POST('image');
+        $returnData = array();
+        $returnData = array('msg'=>saveBase64Image($file));
+//        $returnData = array('msg'=>$file);
+        return_result('error', '2000', $returnData);
+//         return view('./index',['name'=>'thinkphp']);
+     }
 }

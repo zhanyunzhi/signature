@@ -7,17 +7,37 @@
     {js href="../../static/js/draw.js" /}
     <title>Title</title>
     <style>
-        a{
+        html,body{margin:0;padding:0;}
+        #canvasBox {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .greet {
+            padding: 20px;
+            font-size: 20px;
+            user-select: none;
+        }
+        .greet a {
             cursor: pointer;
+        }
+        .greet select {
+            font-size: 18px;
+        }
+        canvas {
+            flex: 1;
+            cursor: crosshair;
+            border: 2px dashed #d3d3d3;
         }
     </style>
 </head>
 <body>
-<div id="canvasBox" :style="getHorizontalStyle">
+<div id="canvasBox">
     <div class="greet">
         <span>Just use canvas to draw</span>
         <a id="clear">清屏</a>
-        <a touchstart="download()" mousedown="download()" id="download">下载</a>
+        <a id="download">下载</a>
+        <a id="upload">上传</a>
         <select id="status">
             <option value="0">正常</option>
             <option value="90">顺时针旋转90°</option>
@@ -29,17 +49,25 @@
 </div>
 </body>
 <script>
+
+    var canvasBox = document.getElementById('canvasBox');
+    var draw = null;
+    var horizontalStyle = getHorizontalStyle(0);
+    $('#canvasBox').css(horizontalStyle);
+
     $("#status").change(function(){
-        getHorizontalStyle($(this).val())
+        horizontalStyle = getHorizontalStyle($(this).val())
+        $('#canvasBox').css(horizontalStyle);
     });
     $("#clear").on('touchstart mousedown',function(){
         clear();
     });
-    $("#download").on('touchstart mousedown',function(){
+    $("#download").on('touch click',function(){
         download()
     });
-    var canvasBox = document.getElementById('canvasBox');
-    initCanvas(0);
+    $("#upload").on('touch click',function(){
+        upload()
+    });
 
     function getHorizontalStyle(degree) {
         degree = parseInt(degree);
@@ -82,12 +110,12 @@
         draw.clear();
     };
     function download() {
-        draw.downloadPNGImage(this.draw.getPNGImage());
+        draw.downloadPNGImage(draw.getPNGImage());
     };
     function upload() {
-        const image = this.draw.getPNGImage();
-        const blob = this.draw.dataURLtoBlob(image);
-        const url = '';
+        const image = draw.getPNGImage();
+        const blob = draw.dataURLtoBlob(image);
+        const url = 'uploadImage';
         const successCallback = (response) => {
             console.log(response);
         };
