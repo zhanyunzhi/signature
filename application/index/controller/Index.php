@@ -11,13 +11,9 @@ class Index
          return view('./index',['name'=>'thinkphp']);
      }
     public function uploadImage() {
-        //$file = request()->file('image');
         $file = $_POST['image'];
-        //$file = $_FILES['image'];
-        //$returnData = array('msg'=>$file);
-        //$returnData = array();
+        $returnData = array();
         $returnData = array('msg'=>saveBase64Image($file));
-        //$returnData = array('msg'=>$file);
         return_result('error', '2000', $returnData);
 //         return view('./index',['name'=>'thinkphp']);
      }

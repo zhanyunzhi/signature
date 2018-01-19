@@ -7,13 +7,21 @@
     <style>
         html,body{margin:0;padding:0;}
         #canvasBox {
+            display: -webkit-box;
+            display: -ms-flexbox;
             display: flex;
+            -webkit-box-orient: vertical;
+            -webkit-box-direction: normal;
+            -ms-flex-direction: column;
             flex-direction: column;
             height: 100%;
         }
         .greet {
             padding: 20px;
             font-size: 20px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
             user-select: none;
         }
         .greet a {
@@ -23,32 +31,60 @@
             font-size: 18px;
         }
         canvas {
+            -webkit-box-flex: 1;
+            -ms-flex: 1;
             flex: 1;
             cursor: crosshair;
             border: 2px dashed #d3d3d3;
         }
+        #app {
+             position: absolute;
+             top: 0;
+             left: 0;
+             right: 0;
+             bottom: 0;
+             font-family: Avenir,Helvetica,Arial,sans-serif;
+             -webkit-font-smoothing: antialiased;
+             -moz-osx-font-smoothing: grayscale;
+             text-align: center;
+             color: #2c3e50;
+         }
     </style>
 </head>
 <body>
-<div id="canvasBox">
-    <div class="greet">
-        <span>Just use canvas to draw</span>
-        <a id="clear">清屏</a>
-        <a id="download">下载</a>
-        <a id="upload">上传</a>
-        <select id="status">
-            <option value="0">正常</option>
-            <option value="90">顺时针旋转90°</option>
-            <option value="180">顺时针旋转180°</option>
-            <option value="-90">逆时针旋转90°</option>
-        </select>
+<div id="app">
+    <div id="canvasBox">
+        <div class="greet">
+            <span>Just use canvas to draw</span>
+            <span id="clear">清屏</span>
+            <span id="download">下载</span>
+            <span id="upload">上传</span>
+            <select id="status">
+                <option value="0">正常</option>
+                <option value="90">顺时针旋转90°</option>
+                <option value="180">顺时针旋转180°</option>
+                <option value="-90">逆时针旋转90°</option>
+            </select>
+        </div>
+        <canvas></canvas>
     </div>
-    <canvas></canvas>
 </div>
 </body>
 {js href="../../static/js/jquery-3.2.1.min.js" /}
 {js href="../../static/js/draw.js" /}
 <script>
+    (function(defaultFontSize, defaultScreenWidth) {
+        var htmlNode = document.getElementsByTagName('html')[0];
+        function resize() {
+            var screenWidth = document.body.offsetWidth;
+            var fontSize = (screenWidth / defaultScreenWidth) * defaultFontSize;
+            htmlNode.style.fontSize = fontSize + 'px';
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            resize();
+        });
+        window.addEventListener('resize', resize);
+    })(10, 375);
 
     var canvasBox = document.getElementById('canvasBox');
     var draw = null;
@@ -60,12 +96,13 @@
         $('#canvasBox').css(horizontalStyle);
     });
     $("#clear").on('touchstart mousedown',function(){
+        alert(1121)
         clear();
     });
-    $("#download").on('touch click',function(){
+    $("#download").on('touchstart mousedown',function(){
         download()
     });
-    $("#upload").on('touch click',function(){
+    $("#upload").on('touchstart mousedown',function(){
         upload()
     });
 
@@ -97,7 +134,7 @@
         return {
             transform: 'rotate(' + degree + 'deg) translate(' + length + 'px,' + length + 'px)',
             width: width + 'px',
-            height: height + 'px',
+            height: height/2 + 'px',
             transformOrigin: 'center center',
         };
     };
