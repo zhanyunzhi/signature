@@ -22,7 +22,7 @@ function Draw(canvas, degree, config = {}) {
     this.height = height;
     const context = this.context;
 
-    // ¸ù¾ÝÉè±¸ÏñËØ±ÈÓÅ»¯canvas»æÍ¼
+    // æ ¹æ®è®¾å¤‡åƒç´ æ¯”ä¼˜åŒ–canvasç»˜å›¾
     const devicePixelRatio = window.devicePixelRatio;
     if (devicePixelRatio) {
         canvas.style.width = `${width}px`;
@@ -44,7 +44,7 @@ function Draw(canvas, degree, config = {}) {
     const { left, top } = canvas.getBoundingClientRect();
     const point = {};
     const isMobile = /phone|pad|pod|iPhone|iPod|ios|iPad|Android|Mobile|BlackBerry|IEMobile|MQQBrowser|JUC|Fennec|wOSBrowser|BrowserNG|WebOS|Symbian|Windows Phone/i.test(navigator.userAgent);
-    // ÒÆ¶¯¶ËÐÔÄÜÌ«Èõ, È¥µôÄ£ºýÒÔÌá¸ßÊÖÐ´äÖÈ¾ËÙ¶È
+    // ç§»åŠ¨ç«¯æ€§èƒ½å¤ªå¼±, åŽ»æŽ‰æ¨¡ç³Šä»¥æé«˜æ‰‹å†™æ¸²æŸ“é€Ÿåº¦
     if (!isMobile) {
         context.shadowBlur = 1;
         context.shadowColor = 'black';
@@ -97,7 +97,7 @@ function Draw(canvas, degree, config = {}) {
         });
     }
 
-// ÖØÖÃ»­²¼×ø±êÏµ
+// é‡ç½®ç”»å¸ƒåæ ‡ç³»
     if (typeof degree === 'number') {
         this.degree = degree;
         context.rotate((degree * Math.PI) / 180);
@@ -150,21 +150,21 @@ Draw.prototype = {
             const degreePI = (degree * Math.PI) / 180;
 
             switch (degree) {
-                // ÄæÊ±ÕëÐý×ª90¡ã
+                // é€†æ—¶é’ˆæ—‹è½¬90Â°
                 case -90:
                     canvas.width = height;
                     canvas.height = width;
                     context.rotate(degreePI);
                     context.drawImage(image, -width, 0);
                     break;
-                // Ë³Ê±ÕëÐý×ª90¡ã
+                // é¡ºæ—¶é’ˆæ—‹è½¬90Â°
                 case 90:
                     canvas.width = height;
                     canvas.height = width;
                     context.rotate(degreePI);
                     context.drawImage(image, 0, -height);
                     break;
-                // Ë³Ê±ÕëÐý×ª180¡ã
+                // é¡ºæ—¶é’ˆæ—‹è½¬180Â°
                 case 180:
                     canvas.width = width;
                     canvas.height = height;
@@ -213,11 +213,11 @@ Draw.prototype = {
         }
         this.context.clearRect(0, 0, width, height);
     },
-    upload(blob, url, success, failure) {
+    upload(image, blob, url, success, failure) {
         const formData = new FormData();
         const xhr = new XMLHttpRequest();
         xhr.withCredentials = true;
-        formData.append('image', blob, 'sign');
+        formData.append('image', image);
 
         xhr.open('POST', url, true);
         xhr.onload = () => {

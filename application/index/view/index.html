@@ -2,57 +2,38 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no">
     <title>Title</title>
-    <style>
-        html,body{margin:0;padding:0;}
-        #canvasBox {
-            display: -webkit-box;
-            display: -ms-flexbox;
-            display: flex;
-            -webkit-box-orient: vertical;
-            -webkit-box-direction: normal;
-            -ms-flex-direction: column;
-            flex-direction: column;
-            height: 100%;
-        }
-        .greet {
-            padding: 20px;
-            font-size: 20px;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        .greet a {
-            cursor: pointer;
-        }
-        .greet span {
-            cursor: pointer;
-        }
-        .greet select {
-            font-size: 18px;
-        }
-        canvas {
-            -webkit-box-flex: 1;
-            -ms-flex: 1;
-            flex: 1;
-            cursor: crosshair;
-            border: 2px dashed #d3d3d3;
-        }
-        #app {
-             position: absolute;
-             top: 0;
-             left: 0;
-             right: 0;
-             bottom: 0;
-             font-family: Avenir,Helvetica,Arial,sans-serif;
-             -webkit-font-smoothing: antialiased;
-             -moz-osx-font-smoothing: grayscale;
-             text-align: center;
-             color: #2c3e50;
-         }
-    </style>
+    <script>
+        var docEle = document.documentElement;
+        var eDiv = document.createElement('div');
+        //        eDiv.innerHTML = '<div class="mask flexcontainer" id="mask"> <div class="mask-box"> <div class="mask-pic"> <i></i> </div> <span>为了更好的体验，请将手机/平板横过来</span> </div> </div>';
+        eDiv.className = 'landscape';
+        eDiv.style.display = 'none';
+        docEle.appendChild(eDiv);
+        var timer = null;
+        fn = function() {
+            timer = setTimeout(function(){          //加延迟0.1s不然在android下获取到的宽高是旋转屏幕之前的宽高
+                var width = docEle.clientWidth;
+                var height = docEle.clientHeight;
+                //                width = width<height?window.screen.height:width;
+                if( width < 320 ) {
+                    docEle.style.fontSize = 42.6667 + "px";//
+                }
+                else if( width > 750 ) {
+                    docEle.style.fontSize = 100 + "px";
+                }
+                else {
+                    //以750设计稿宽度为基准设置fontSize:100px;这样保证iPhone6以下是高清
+                    docEle.style.fontSize = 100 * (width / 750) + "px";
+                }
+            },150);
+        };
+        var evt = "onorientationchange" in window ? "orientationchange" : "resize";//区分Mobile和PC以加载不同的事件
+        window.addEventListener(evt, fn, false);
+        fn();
+    </script>
+    {css href="../../static/css/style.css"}
 </head>
 <body>
 <div id="app">
@@ -73,50 +54,36 @@
     </div>
 </div>
 </body>
-{js href="../../static/js/jquery-3.2.1.min.js" /}
-{js href="../../static/js/draw.js" /}
+{js href="../../static/js/jquery-3.2.1.min.js"}
+{js href="../../static/js/draw2.js"}
 <script>
-    (function(defaultFontSize, defaultScreenWidth) {
-        var htmlNode = document.getElementsByTagName('html')[0];
-        function resize() {
-            var screenWidth = document.body.offsetWidth;
-            var fontSize = (screenWidth / defaultScreenWidth) * defaultFontSize;
-            htmlNode.style.fontSize = fontSize + 'px';
-        }
-        document.addEventListener('DOMContentLoaded', function() {
-            resize();
-        });
-        window.addEventListener('resize', resize);
-    })(10, 375);
-
     var canvasBox = document.getElementById('canvasBox');
     var draw = null;
     var horizontalStyle = getHorizontalStyle(0);
     $('#canvasBox').css(horizontalStyle);
 
-    $("#status").change(function(){
-        horizontalStyle = getHorizontalStyle($(this).val())
+    $("#status").on('change', function () {
+        horizontalStyle = getHorizontalStyle($(this).val());
         $('#canvasBox').css(horizontalStyle);
     });
-    $("#clear").on('touchstart mousedown',function(){
-        alert(1121)
+    $("#clear").on('touchstart mousedown', function () {
         clear();
     });
-    $("#download").on('touchstart mousedown',function(){
-        download()
+    $("#download").on('touchstart mousedown', function () {
+        download();
     });
-    $("#upload").on('touchstart mousedown',function(){
-        upload()
+    $("#upload").on('touchstart mousedown', function () {
+        upload();
     });
 
     function getHorizontalStyle(degree) {
         degree = parseInt(degree);
-        const d = document;
-        const w = window.innerWidth || d.documentElement.clientWidth || d.body.clientWidth;
-        const h = window.innerHeight || d.documentElement.clientHeight || d.body.clientHeight;
-        let length = (h - w) / 2;
-        let width = w;
-        let height = h;
+        var d = document;
+        var w = window.innerWidth || d.documentElement.clientWidth || d.body.clientWidth;
+        var h = window.innerHeight || d.documentElement.clientHeight || d.body.clientHeight;
+        var length = (h - w) / 2;
+        var width = w;
+        var height = h;
         switch (degree) {
             case -90:
                 length = -length;
@@ -130,21 +97,21 @@
         if (canvasBox) {
             canvasBox.removeChild(document.querySelector('canvas'));
             canvasBox.appendChild(document.createElement('canvas'));
-            setTimeout(() => {
+            setTimeout(function () {
                 initCanvas(degree);
             }, 200);
         }
         return {
             transform: 'rotate(' + degree + 'deg) translate(' + length + 'px,' + length + 'px)',
             width: width + 'px',
-            height: height/2 + 'px',
-            transformOrigin: 'center center',
+            height: height / 2 + 'px',
+            transformOrigin: 'center center'
         };
     };
 
     function initCanvas(degree) {
-        const canvas = document.querySelector('canvas');
-        draw = new Draw(canvas, -degree);
+        var canvas = document.querySelector('canvas');
+        draw = new Draw(canvas, -degree, {lineWidth:4,strokeStyle:'#000'});
     };
     function clear() {
         draw.clear();
@@ -153,17 +120,16 @@
         draw.downloadPNGImage(draw.getPNGImage());
     };
     function upload() {
-        const image = draw.getPNGImage();
-        const blob = draw.dataURLtoBlob(image);
-        const url = 'uploadImage';
-        const successCallback = (response) => {
+        var image = draw.getPNGImage();
+        var blob = draw.dataURLtoBlob(image);
+        var url = 'uploadImage';
+        var successCallback = function successCallback(response) {
             console.log(response);
         };
-        const failureCallback = (error) => {
+        var failureCallback = function failureCallback(error) {
             console.log(error);
         };
         draw.upload(image, blob, url, successCallback, failureCallback);
     };
-
 </script>
 </html>
