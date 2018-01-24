@@ -13,8 +13,13 @@ class Index
     public function uploadImage() {
         $file = $_POST['image'];
         $returnData = array();
-        $returnData = array('msg'=>saveBase64Image($file));
-        return_result('error', '2000', $returnData);
+        $returnData = saveBase64Image($file);
+        if($returnData['code'] === '0'){
+            return_result('success', '1000', $returnData);
+        }
+        if($returnData['code'] === '1'){
+            return_result('fail', '2000', $returnData);
+        }
 //         return view('./index',['name'=>'thinkphp']);
      }
 }

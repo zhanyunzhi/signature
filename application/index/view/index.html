@@ -124,10 +124,14 @@
         var blob = draw.dataURLtoBlob(image);
         var url = 'uploadImage';
         var successCallback = function successCallback(response) {
+            response = JSON.parse(response);
             console.log(response);
+            if(response.code == '1000') alert('保存图片成功');
+            if(response.code == '2000') alert('保存图片失败');
         };
         var failureCallback = function failureCallback(error) {
             console.log(error);
+            alert('请求失败');
         };
         draw.upload(image, blob, url, successCallback, failureCallback);
     };
