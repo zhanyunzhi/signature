@@ -5,7 +5,7 @@ use think\Db;
 class Copy
 {
     public function copyChapter() {             //获取章节列表数据
-        $url = 'http://m.p5w.net/s_exam/practice/list';
+        $url = 'http://m.p5w.net/s_exam/practice/list_tiny';
         $urlDatas = getUrlData($url,'GET','');
         $urlDatas = $urlDatas['data'];      //url返回的data属性数据
         $length = count($urlDatas);     //数据长度
@@ -42,7 +42,7 @@ class Copy
         $qno = empty($_GET['qno']) ? 1 : $_GET['qno'];      //题目qno
         $size = empty($_GET['size']) ? 10 : $_GET['size'];  //一页的数据数量
         $type = empty($_GET['type']) ? 0 : $_GET['type'];   //类型
-        $url = 'http://m.p5w.net/s_exam/practice/chapter/questions_after';
+        $url = 'http://m.p5w.net/s_exam/practice/chapter/questions_after_tiny';
         $param = array('cid'=>$cid,'page'=>$page,'qno'=>$qno,'size'=>$size,'type'=>$type);
         $urlDatas = getUrlData($url,'POST',$param);
         $urlDatas = $urlDatas['data'];      //url返回的data属性数据
