@@ -73,3 +73,20 @@ function saveBase64Image($base64_image_content){
     }
     return $data;
  }
+/**
+ * 发起网络请求，并返回获取到的数据
+ */
+
+function getUrlData($url,$method = 'GET',$param = array()){
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    if($method == 'POST'){       // post数据
+        $post_data = $param;
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $post_data);   // post的变量
+    }
+    $result = json_decode(curl_exec($ch),true);
+    curl_close($ch);
+    return $result;
+ }
