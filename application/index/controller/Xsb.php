@@ -147,4 +147,14 @@ class Xsb
         }
         return_result('success', '000000', $returnData);
     }
+    /*
+     * 登录
+     * param：cid（章节id）
+     * return：当前章节的所有题目列表清单
+     * */
+    public function login()
+    {
+        $returnData = array();
+        return_result('success', '000000', $returnData);
+    }
 }
