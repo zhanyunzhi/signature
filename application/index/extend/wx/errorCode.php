@@ -1,5 +1,5 @@
-﻿﻿<?php
-
+<?php
+namespace wx;
 /**
  * error code 说明.
  * <ul>
