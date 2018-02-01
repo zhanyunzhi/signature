@@ -154,7 +154,21 @@ class Xsb
      * */
     public function login()
     {
+        $appid = config('appid');   //小程序的appid
+        $secret = config('secret');  //小程序的secret
+        $post_data = request()->param();         //获取post过来的参数
+        $code = isset($post_data['code']) ? $post_data['code'] : '';
+        $url = "https://api.weixin.qq.com/sns/jscode2session?appid=$appid&secret=$secret&js_code=$code&grant_type=authorization_code";
+//        $urlDatas = getUrlData($url,'GET','');
+
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $urlDatas = json_decode(curl_exec($ch),true);
+        curl_close($ch);
+        die($urlDatas);
         $returnData = array();
+        $returnData = $urlDatas;
         return_result('success', '000000', $returnData);
     }
 }
