@@ -274,7 +274,7 @@ class Xsb
                     return_result('收藏失败', ErrorCode::$HANDLE_ERROR, $returnData);
                 };
             }else{          //qid已经在数据库中的收藏记录中了，也就是已经收藏过了
-                return_result('已收藏', ErrorCode::$REPETITION_HANDLE_ERROR, $returnData);
+                return_result('已收藏', ErrorCode::$SUCCESS, $returnData);
             }
         }else{          //说明用户是第一次收藏题目，新增一条记录
             $sql_data = ['openId' => $openId, 'qids' => ','.$qid, 'add_time' => $timeNow ];
