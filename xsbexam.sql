@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 50714
 File Encoding         : 65001
 
-Date: 2018-01-24 23:46:55
+Date: 2018-02-02 17:56:19
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -42,6 +42,26 @@ INSERT INTO `chapter` VALUES ('9', '第九章', '证券登记', '2018-01-24 23:0
 INSERT INTO `chapter` VALUES ('10', '第十章', '监管措施与违规处分', '2018-01-24 23:01:20');
 INSERT INTO `chapter` VALUES ('11', '第十一章', '市场分层', '2018-01-24 23:01:20');
 INSERT INTO `chapter` VALUES ('12', '第十二章', '资本市场诚信建设', '2018-01-24 23:01:20');
+
+-- ----------------------------
+-- Table structure for collect
+-- ----------------------------
+DROP TABLE IF EXISTS `collect`;
+CREATE TABLE `collect` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `qids` text,
+  `openId` varchar(64) DEFAULT NULL,
+  `uid` int(11) DEFAULT NULL,
+  `collect_count` int(11) DEFAULT '0',
+  `add_time` datetime DEFAULT NULL,
+  `edit_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of collect
+-- ----------------------------
+INSERT INTO `collect` VALUES ('3', ',8,10,14', 'oKzcK0blmLOdOTpH1x-2t8YwBWjA', null, '10', '2018-02-02 16:41:23', '2018-02-02 17:52:32');
 
 -- ----------------------------
 -- Table structure for topic
@@ -2341,3 +2361,29 @@ INSERT INTO `topic` VALUES ('217', '12', '详见《对于失信主体实施联�
 INSERT INTO `topic` VALUES ('221', '12', '根据《对于失信主体实施联合惩戒措施的监管问答》的有关规定，挂牌公司股票发行对象属于失信联合惩戒对象的，主办券商和律师应对其被纳入失信联合惩戒对象名单的原因、相关情形是否已充分规范披露进行核查并发表明确意见。故C项不正确。', '关于挂牌公司发行股票涉及失信联合惩戒对象的，下列说法不正确的是（   ）。', 'C', '挂牌公司实施股票发行，主办券商和律师应当对挂牌公司等相关主体和股票发行对象是否属于失信联合惩戒对象进行核查并发表意见', '挂牌公司或其控股股东、实际控制人、控股子公司属于失信联合惩戒对象的，在相关情形消除前不得实施股票发行', '挂牌公司股票发行对象属于失信联合惩戒对象的，挂牌公司不得向其发行股票', '挂牌公司应当在《股票发行情况报告书》中对上述情况进行披露', '', '', '16', '0', '2018-01-24 23:43:05');
 INSERT INTO `topic` VALUES ('226', '12', '解析：详见《对于失信主体实施联合惩戒措施的监管问答》第二点。', '下列关于全国股转系统失信联合惩戒对象的说法，不正确的是（   ）。', 'D', '申请挂牌公司及相关主体（包括申请挂牌公司的法定代表人、控股股东、实际控制人、董事、监事、高级管理人员，以及控股子公司）为失信联合惩戒对象的，限制其在全国股份转让系统挂牌', '失信联合惩戒对象不得担任挂牌公司董事、监事和高级管理人员（以下简称董监高）。挂牌公司不得聘任或选举失信联合惩戒对象担任公司董监高', '挂牌公司或其控股股东、实际控制人、控股子公司属于失信联合惩戒对象的，在相关情形消除前不得实施股票发行', '挂牌公司实施重大资产重组，挂牌公司及其控股股东、实际控制人、控股子公司，标的资产及其控股子公司可以为失信联合惩戒对象', '', '', '17', '0', '2018-01-24 23:43:05');
 INSERT INTO `topic` VALUES ('231', '12', '根据《对于失信主体实施联合惩戒措施的监管问答》第三点的有关规定，对收购人的要求限于法定代表人、实际控制人和董监高，不包括核心员工，故B 选项不正确。', '关于挂牌公司收购涉及失信联合惩戒对象的，下列说法不正确的是（   ）。', 'B', '失信联合惩戒对象不得收购挂牌公司', '如挂牌公司收购人为法人机构及其他非自然人主体，其实际控制人、法定代表人、现任董监高以及核心员工不得为失信联合惩戒对象', '收购人聘请的财务顾问和律师、挂牌公司聘请的律师应对收购人及相关主体是否被纳入失信联合惩戒对象名单进行核查并发表意见', '收购人应当在《收购报告书》中对上述情况进行披露', '', '', '18', '0', '2018-01-24 23:43:05');
+
+-- ----------------------------
+-- Table structure for user
+-- ----------------------------
+DROP TABLE IF EXISTS `user`;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `openId` varchar(64) NOT NULL,
+  `nickName` varchar(128) DEFAULT NULL,
+  `gender` varchar(2) DEFAULT NULL,
+  `city` varchar(64) DEFAULT NULL,
+  `province` varchar(64) DEFAULT NULL,
+  `country` varchar(64) DEFAULT NULL,
+  `avatarUrl` varchar(255) DEFAULT NULL,
+  `unionId` int(11) DEFAULT NULL,
+  `language` varchar(32) DEFAULT NULL,
+  `visit_count` int(11) DEFAULT '0',
+  `add_time` datetime DEFAULT NULL,
+  `edit_time` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`,`openId`)
+) ENGINE=MyISAM AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of user
+-- ----------------------------
+INSERT INTO `user` VALUES ('6', 'oKzcK0blmLOdOTpH1x-2t8YwBWjA', '志', '1', 'Shenzhen', 'Guangdong', 'China', 'https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJL365CsJiatj96Q2qo4pNBL4QAJbuGn49U9pSvh32v6jLOsRQ6DSvHGDvVibL32wBddn4ibQZaoRcLw/0', null, 'zh_CN', '64', '2018-02-02 14:29:36', '2018-02-02 17:28:10');
