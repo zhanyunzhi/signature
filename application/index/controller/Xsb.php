@@ -1,6 +1,7 @@
 <?php
 namespace app\index\controller;
 use think\Db;
+use my\ErrorCode;
 
 
 class Xsb
@@ -17,17 +18,17 @@ class Xsb
             if(empty($data)){
                 $message = 'fail';
                 $returnData = array();
-                return_result($message, '100001', $returnData);
+                return_result($message, ErrorCode::$DATABASE_SEARCH_ERROR, $returnData);
             }else{
                 $returnData = $data;
-                return_result($message, '000000', $returnData);
+                return_result($message, ErrorCode::$SUCCESS, $returnData);
             }
         }catch(\Exception $e){
             $message = '获取数据失败';
             $returnData = array();
-            return_result($message, '200001', $returnData);
+            return_result($message, ErrorCode::$DATABASE_SYS_ERROR, $returnData);
         }
-        return_result('success', '000000', $returnData);
+        return_result('success', ErrorCode::$SUCCESS, $returnData);
     }
     /*
      * 返回练习题
@@ -48,7 +49,7 @@ class Xsb
         $message = 'success';
         if($type === '' || $cid === '' || $qno ===''){            //判断必须要的参数是否为空字符串是的话返回对应提示
             $message = '缺少参数';
-            return_result($message, '200002', $returnData);
+            return_result($message, ErrorCode::$MISSING_PARAMETER_ERROR, $returnData);
         }
         try{
             $data = Db::table("topic")
@@ -61,7 +62,7 @@ class Xsb
             if(empty($data)){
                 $message = 'fail';
                 $returnData = array();
-                return_result($message, '100001', $returnData);
+                return_result($message, ErrorCode::$DATABASE_SEARCH_ERROR, $returnData);
             }else{
                 $options = array();
                 foreach($data as $k => $d){
@@ -83,14 +84,14 @@ class Xsb
                     unset($data[$k]['options_f']);
                 }
                 $returnData = $data;
-                return_result($message, '000000', $returnData);
+                return_result($message, ErrorCode::$SUCCESS, $returnData);
             }
         }catch(\Exception $e){
             $message = '获取数据失败';
             $returnData = array();
-            return_result($message, '200001', $returnData);
+            return_result($message, ErrorCode::$DATABASE_SYS_ERROR, $returnData);
         }
-        return_result('success', '000000', $returnData);
+        return_result('success', ErrorCode::$SUCCESS, $returnData);
     }
     /*
      * 返回练习题的题目列表清单
@@ -111,7 +112,7 @@ class Xsb
         $message = 'success';
         if($cid === ''){            //判断必须要的参数是否为空字符串是的话返回对应提示
             $message = '缺少参数';
-            return_result($message, '200002', $returnData);
+            return_result($message, ErrorCode::$MISSING_PARAMETER_ERROR, $returnData);
         }
         try{
             $data = Db::table("topic")
@@ -126,7 +127,7 @@ class Xsb
             if(empty($data)){
                 $message = 'fail';
                 $returnData = array();
-                return_result($message, '100001', $returnData);
+                return_result($message, ErrorCode::$DATABASE_SEARCH_ERROR, $returnData);
             }else{
                 $data_filter = array();
                 $data_filter[0] = array();
@@ -139,30 +140,24 @@ class Xsb
                 };
                 $returnData['chapter_title'] = $chapter['title']." ".$chapter['content'];
                 $returnData['list'] = $data_filter;
-                return_result($message, '000000', $returnData);
+                return_result($message, ErrorCode::$SUCCESS, $returnData);
             }
         }catch(\Exception $e){
             $message = '获取数据失败';
             $returnData = array();
-            return_result($message, '200001', $returnData);
+            return_result($message, ErrorCode::$DATABASE_SYS_ERROR, $returnData);
         }
-        return_result('success', '000000', $returnData);
+        return_result('success', ErrorCode::$SUCCESS, $returnData);
     }
     /*
      * 登录
-     * param：cid（章节id）
-     * return：当前章节的所有题目列表清单
+     *
+     * return：session3rd本地服务器与小程序之间的登录session
      * */
-    public function wx_login()
-    {
+    public function wx_login() {
+//        $this->check_login();
         $appid = config('appid');   //小程序的appid
         $secret = config('secret');  //小程序的secret
-        /*$post_data = request()->param();         //获取post过来的参数
-        $code = isset($post_data['code']) ? $post_data['code'] : '';
-        $rawData  = isset($post_data['rawData ']) ? $post_data['rawData '] : '';
-        $signature = isset($post_data['signature']) ? $post_data['signature'] : '';
-        $encryptedData = isset($post_data['encryptedData']) ? $post_data['encryptedData'] : '';
-        $iv = isset($post_data['iv']) ? $post_data['iv'] : '';*/
         $code = input("code", '', 'htmlspecialchars_decode');
         $rawData = input("rawData", '', 'htmlspecialchars_decode');
         $signature = input("signature", '', 'htmlspecialchars_decode');
@@ -184,8 +179,9 @@ class Xsb
         $urlDatas = json_decode(curl_exec($ch),true);
         curl_close($ch);
         $returnData = array();
-        if(!isset($urlDatas)) return_result('request token failed', '300001', $returnData);
+        if(!isset($urlDatas)) return_result('request session_key failed', ErrorCode::$GET_WX_LOGIN_SESSION_KEY_ERROR, $returnData);
         $session_key = $urlDatas['session_key'];
+        $openid = $urlDatas['openid'];
         /**
          * 5.server计算signature, 并与小程序传入的signature比较, 校验signature的合法性, 不匹配则返回signature不匹配的错误. 不匹配的场景可判断为恶意请求, 可以不返回.
          * 通过调用接口（如 wx.getUserInfo）获取敏感数据时，接口会同时返回 rawData、signature，其中 signature = sha1( rawData + session_key )
@@ -194,7 +190,7 @@ class Xsb
          * ，使用相同的算法计算出签名 signature2 ，比对 signature 与 signature2 即可校验数据的可信度。
          */
         $signature2 = sha1($rawData . $session_key);
-        if ($signature2 !== $signature) return_result('signature not match'.$session_key, '300002', $returnData);
+        if ($signature2 !== $signature) return_result('signature not match'.$session_key, ErrorCode::$WX_LOGIN_SIGNATURE_ERROR, $returnData);
         /**
          *
          * 6.使用第4步返回的session_key解密encryptData, 将解得的信息与rawData中信息进行比较, 需要完全匹配,
@@ -204,7 +200,7 @@ class Xsb
         $pc = new \wx\WXBizDataCrypt($appid, $session_key);
         $errCode = $pc->decryptData($encryptedData, $iv, $data);
         if ($errCode !== 0) {
-            return_result('encryptData not match'.$errCode, '300003', $returnData);
+            return_result('encryptData not match'.$errCode, ErrorCode::$WX_LOGIN_ENCRYPT_DATA_ERROR, $returnData);
         }
         /**
          * 7.生成第三方3rd_session，用于第三方服务器和小程序之间做登录态校验。为了保证安全性，3rd_session应该满足：
@@ -215,10 +211,114 @@ class Xsb
          * 以 $session3rd 为key，sessionKey+openId为value，写入memcached
          */
         $data = json_decode($data, true);
-        $session3rd = randomFromDev(16);
-        $data['session3rd'] = $session3rd;
-        cache($session3rd, $data['openId'] . $session_key);
-        $returnData = $data;
-        return_result('success', '000000', $returnData);
+        if($openid !== $data['openId']) return_result('openid not match'.$session_key, ErrorCode::$WX_LOGIN_VERIFY_ERROR, $returnData);      //openid验证
+        if($time=intval(time()) - $data['watermark']['timestamp'] > 7200) return_result('openid is expire'.$session_key, ErrorCode::$WX_LOGIN_VERIFY_ERROR, $returnData);  //时间戳时效性验证，2个小时
+        $session3rd = randomFromDev(16);        //生成16位随机数
+        cache($session3rd, $session_key . $data['openId'], 3600);       //将session_key和openId存入cache中
+        $timeNow = date('Y-m-d H:i:s',time());      //获取当前时间
+        $user = Db::table("user")               //查询数据是否已经存在
+            ->where('openId','eq',$data['openId'])
+            ->field('id')
+            ->find();
+        if(!$user){         //新增需要插入到数据库的数据集
+            $sql_data = ['openId' => $data['openId'], 'nickName' => $data['nickName'], 'gender' => $data['gender'], 'city' => $data['city'], 'province' => $data['province'], 'country' => $data['country'], 'avatarUrl' => $data['avatarUrl'], 'language' => $data['language'], 'add_time' => $timeNow ];
+            Db::table('user')->insert($sql_data);            //插入数据库
+        }else{          //更新
+            $sql_data = ['openId' => $data['openId'], 'nickName' => $data['nickName'], 'gender' => $data['gender'], 'city' => $data['city'], 'province' => $data['province'], 'country' => $data['country'], 'avatarUrl' => $data['avatarUrl'], 'language' => $data['language'], 'edit_time' => $timeNow ];
+            Db::table('user')
+                ->where('openId','eq',$data['openId'])
+                ->inc('visit_count')                //统计访问次数
+                ->update($sql_data);
+        }
+        $returnData = array('token' => $session3rd);
+        return_result('success', ErrorCode::$SUCCESS, $returnData);
+    }
+    /*
+     * 检查登录状态
+     *
+     * return：返回openId
+     * */
+    public function check_login() {
+        $session3rd = request()->header()['token'];         //获取header中的token
+        $openid_session_key = cache($session3rd);
+        $returnData = array();
+        if(!$openid_session_key) return_result('session invalid', ErrorCode::$LOGIN_VERIFY, $returnData);          //服务器中的$session3rd不存在或者失效
+//        return substr($openid_session_key, 0,24);
+        return substr($openid_session_key, 24);         //返回openId
+    }
+    /*
+     * 增加收藏
+     * return：成功或者失败
+     * */
+    public function collect_add() {
+        $openId = $this->check_login();
+        $post_data = request()->param();         //获取post过来的参数
+        $qid = isset($post_data['qid']) ? $post_data['qid'] : '';
+        $timeNow = date('Y-m-d H:i:s',time());      //获取当前时间
+        $result = '';       //数据库操作的结果
+        $returnData = array();
+        $collect = Db::table("collect")               //查询数据是否已经存在
+            ->where('openId','eq',$openId)
+            ->field('id,qids')
+            ->find();
+        if($collect){
+            if(strpos($collect['qids'],strval($qid)) === false){                    //qid不在数据库中的收藏记录中了，也就是还没收藏过
+                $sql_data = [ 'qids' => $collect['qids'].','.$qid, 'edit_time' => $timeNow ];
+                $result = Db::table('collect')          //更新数据库
+                    ->where('openId','eq',$openId)
+                    ->inc('collect_count')                //统计操作次数
+                    ->update($sql_data);
+                if($result > 0) {
+                    return_result('success', ErrorCode::$SUCCESS, $returnData);
+                }else{
+                    return_result('收藏失败', ErrorCode::$HANDLE_ERROR, $returnData);
+                };
+            }else{          //qid已经在数据库中的收藏记录中了，也就是已经收藏过了
+                return_result('已收藏', ErrorCode::$REPETITION_HANDLE_ERROR, $returnData);
+            }
+        }else{          //说明用户是第一次收藏题目，新增一条记录
+            $sql_data = ['openId' => $openId, 'qids' => ','.$qid, 'add_time' => $timeNow ];
+            $result = Db::table('collect')->insert($sql_data);            //插入数据库
+            if($result > 0) {
+                return_result('success', ErrorCode::$SUCCESS, $returnData);
+            }else{
+                return_result('收藏失败', ErrorCode::$HANDLE_ERROR, $returnData);
+            };
+        }
+    }
+    /*
+     * 删除收藏
+     * return：成功或者失败
+     * */
+    public function collect_delete() {
+        $openId = $this->check_login();
+        $post_data = request()->param();         //获取post过来的参数
+        $qid = isset($post_data['qid']) ? $post_data['qid'] : '';
+        $timeNow = date('Y-m-d H:i:s',time());      //获取当前时间
+        $result = '';       //数据库操作的结果
+        $returnData = array();
+        $collect = Db::table("collect")               //查询数据是否已经存在
+            ->where('openId','eq',$openId)
+            ->field('id,qids')
+            ->find();
+        if($collect){
+            if(strpos($collect['qids'],strval($qid)) === false){                    //qid不在数据库中的收藏记录中了，也就是还没收藏过，无法删除
+                return_result('非法操作', ErrorCode::$ILLEGAL_HANDLE_ERROR, $returnData);
+            }else{          //qid已经在数据库中的收藏记录中了，也就是已经收藏过了
+                $collect['qids'] = str_replace(','.strval($qid),"",$collect['qids']);
+                $sql_data = [ 'qids' => $collect['qids'], 'edit_time' => $timeNow ];
+                $result = Db::table('collect')          //更新数据库
+                ->where('openId','eq',$openId)
+                    ->inc('collect_count')                //统计操作次数
+                    ->update($sql_data);
+                if($result > 0) {
+                    return_result('success', ErrorCode::$SUCCESS, $returnData);
+                }else{
+                    return_result('收藏失败', ErrorCode::$HANDLE_ERROR, $returnData);
+                };
+            }
+        }else{          //找不到记录，无法删除
+            return_result('非法操作', ErrorCode::$ILLEGAL_HANDLE_ERROR, $returnData);
+        }
     }
 }
